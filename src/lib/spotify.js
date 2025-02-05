@@ -21,8 +21,16 @@ class SpotifyClient {
 		return spotify;
 	}
 
-	test() {
-		console.log(this.token);
+	async getPopularSongs() {
+		const response = await axios.get(
+			"https://api.spotify.com/v1/playlists/5SLPaOxQyJ8Ne9zpmTOvSe",
+			{
+				headers: {
+					Authorization: "Bearer " + this.token,
+				},
+			}
+		);
+		return response.data.tracks;
 	}
 }
 
