@@ -28,7 +28,7 @@ export default function App() {
 				</header>
 				<section>
 					<h2 className="text-2xl font-semibold mb-5">Popular Songs</h2>
-					<SongList />
+					<SongList isLoading={isLoading} songs={popularSongs} />
 				</section>
 			</main>
 		</div>
