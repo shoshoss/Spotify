@@ -9,6 +9,7 @@ export default function App() {
 	const [popularSongs, setPopularSongs] = useState([]);
 	const [keyword, setKeyword] = useState("");
 	const [searchedSongs, setSearchedSongs] = useState();
+	const [page, setPage] = useState(1);
 	const isSearchedResult = searchedSongs != null;
 	const limit = 20;
 
@@ -22,7 +23,6 @@ export default function App() {
 		const popularSongs = result.items.map((item) => {
 			return item.track;
 		});
-		console.log(popularSongs);
 		setPopularSongs(popularSongs);
 		setIsLoading(false);
 	};
@@ -37,6 +37,18 @@ export default function App() {
 		const result = await spotify.searchSongs(keyword, limit, offset);
 		setSearchedSongs(result.items);
 		setIsLoading(false);
+	};
+
+	const moveToNext = async () => {
+		const nextPage = page + 1;
+		await searchSongs(nextPage);
+		setPage(nextPage);
+	};
+
+	const moveToPrev = async () => {
+		const prevPage = page - 1;
+		await searchSongs(prevPage);
+		setPage(prevPage);
 	};
 
 	return (
@@ -54,7 +66,9 @@ export default function App() {
 						isLoading={isLoading}
 						songs={isSearchedResult ? searchedSongs : popularSongs}
 					/>
-					{isSearchedResult && <Pagination />}
+					{isSearchedResult && (
+						<Pagination onPrev={moveToPrev} onNext={moveToNext} />
+					)}
 				</section>
 			</main>
 		</div>
