@@ -12,7 +12,6 @@ export function SongList(props) {
 	return (
 		<div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
 			{props.songs.map((song) => {
-				console.log(song);
 				return (
 					<a
 						href={song.external_urls.spotify}
