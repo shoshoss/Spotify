@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { SongList } from "./components/SongList";
 import spotify from "./lib/spotify";
 import { SearchInput } from "./components/SearchInput";
+import { Pagination } from "./components/Pagenation";
 
 export default function App() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [popularSongs, setPopularSongs] = useState([]);
 	const [keyword, setKeyword] = useState("");
 	const [searchedSongs, setSearchedSongs] = useState();
+	const [page, setPage] = useState(1);
 	const isSearchedResult = searchedSongs != null;
+	const limit = 20;
+	const [hasNext, setHasNext] = useState(false);
+	const [hasPrev, setHasPrev] = useState(false);
 
 	useEffect(() => {
 		fetchPopularSongs();
@@ -20,7 +25,6 @@ export default function App() {
 		const popularSongs = result.items.map((item) => {
 			return item.track;
 		});
-		console.log(popularSongs);
 		setPopularSongs(popularSongs);
 		setIsLoading(false);
 	};
@@ -29,11 +33,26 @@ export default function App() {
 		setKeyword(e.target.value);
 	};
 
-	const searchSongs = async () => {
+	const searchSongs = async (page) => {
 		setIsLoading(true);
-		const result = await spotify.searchSongs(keyword);
+		const offset = parseInt(page) ? (parseInt(page) - 1) * limit : 0;
+		const result = await spotify.searchSongs(keyword, limit, offset);
+		setHasNext(result.next != null);
+		setHasPrev(result.previous != null);
 		setSearchedSongs(result.items);
 		setIsLoading(false);
+	};
+
+	const moveToNext = async () => {
+		const nextPage = page + 1;
+		await searchSongs(nextPage);
+		setPage(nextPage);
+	};
+
+	const moveToPrev = async () => {
+		const prevPage = page - 1;
+		await searchSongs(prevPage);
+		setPage(prevPage);
 	};
 
 	return (
@@ -51,6 +70,12 @@ export default function App() {
 						isLoading={isLoading}
 						songs={isSearchedResult ? searchedSongs : popularSongs}
 					/>
+					{isSearchedResult && (
+						<Pagination
+							onPrev={hasPrev ? moveToPrev : null}
+							onNext={hasNext ? moveToNext : null}
+						/>
+					)}
 				</section>
 			</main>
 		</div>
